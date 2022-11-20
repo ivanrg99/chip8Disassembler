@@ -1,4 +1,5 @@
 #include <stdio.h>
+//#include <byteswap.h>
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -7,12 +8,6 @@ struct file_contents
     uint16_t *data;
     size_t size;
 } typedef file_contents;
-
-uint16_t changeEndianness16(int16_t val)
-{
-    return (val << 8) |           // left-shift always fills with zeros
-           ((val >> 8) & 0x00ff); // right-shift sign-extends, so force to zero
-}
 
 file_contents read_file(const char *path)
 {
@@ -36,7 +31,8 @@ file_contents read_file(const char *path)
 
 void parse_opcode(uint16_t opcode)
 {
-    opcode = changeEndianness16(opcode);
+    //   opcode = __bswap_16(opcode);
+    opcode = _byteswap_ushort(opcode);
     printf("\n%X", opcode);
 
     switch((opcode & 0xF000 >> 12))
