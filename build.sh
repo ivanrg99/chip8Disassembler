@@ -1,1 +1,1 @@
-clang -g -Wall -Wextra main.cpp -o chip8disassembler
+clang++ -g -Wall -Wextra main.cpp -o chip8disassembler

@@ -1,8 +1,4 @@
 #include <cstdio>
-
-#ifndef _WIN32
-#include <byteswap.h>
-#endif
 #include <cstdint>
 #include <cstdlib>
 #include <iostream>
@@ -13,7 +9,7 @@ struct file_contents {
 } typedef file_contents;
 
 file_contents read_file(const char *path) {
-    file_contents res = {nullptr};
+    file_contents res;
     FILE *f = fopen(path, "rb");
     if (f) {
         fseek(f, 0, SEEK_END);
@@ -31,12 +27,9 @@ file_contents read_file(const char *path) {
 }
 
 void parse_opcode(uint16_t opcode) {
-#ifdef _WIN32
-    opcode = _byteswap_ushort(opcode);
-#else
-    opcode = __bswap_16(opcode);
-#endif
-    // printf("\n%X =>", opcode);
+	//Change to little endian
+    opcode = ((opcode & 0xff) << 8) | ((opcode) >> 8);
+
     const uint16_t op = (opcode & 0xF000) >> 12;
     const uint16_t Vx = (opcode & 0x0F00) >> 8;
     const uint16_t Vy = (opcode & 0x00F0) >> 4;
@@ -44,26 +37,20 @@ void parse_opcode(uint16_t opcode) {
     const uint16_t last2Bytes = (opcode & 0x00FF);
     const uint16_t last3Bytes = (opcode & 0x0FFF);
 
-    // std::cout << std::hex << Vy << std::endl;
-
-    if (opcode == 0x00E0)
+    switch (op) {
+		case 0x0:
+    if (last2Bytes == 0xE0)
         std::cout << "0x" << std::uppercase << std::hex << opcode << "\t | "
                   << "CLS"
                   << "\t\t\t "
                   << "#Clear the display\n";
-    else if (opcode == 0x00EE)
+    else if (last2Bytes == 0xEE)
         std::cout << "0x" << std::uppercase << std::hex << opcode << "\t | "
                   << "RET"
                   << "\t\t\t "
                   << "#Return from a subroutine\n";
 
-    switch (op) {
-    case 0x0:
-        std::cout << "0x" << std::uppercase << std::hex << opcode << "\t | "
-                  << "NOP"
-                  << "\t\t\t "
-                  << "#No operation\n";
-        break;
+			break;
     case 0x1:
         std::cout << "0x" << std::uppercase << std::hex << opcode << "\t | "
                   << "JP " << std::hex << last3Bytes << "\t\t "
