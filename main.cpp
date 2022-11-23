@@ -1,5 +1,5 @@
-#include <cstdio>
 #include <cstdint>
+#include <cstdio>
 #include <cstdlib>
 #include <iostream>
 
@@ -27,7 +27,7 @@ file_contents read_file(const char *path) {
 }
 
 void parse_opcode(uint16_t opcode) {
-	//Change to little endian
+    // Change to little endian
     opcode = ((opcode & 0xff) << 8) | ((opcode) >> 8);
 
     const uint16_t op = (opcode & 0xF000) >> 12;
@@ -38,245 +38,275 @@ void parse_opcode(uint16_t opcode) {
     const uint16_t last3Bytes = (opcode & 0x0FFF);
 
     switch (op) {
-		case 0x0:
-    if (last2Bytes == 0xE0)
-        std::cout << "0x" << std::uppercase << std::hex << opcode << "\t | "
-                  << "CLS"
-                  << "\t\t\t "
-                  << "#Clear the display\n";
-    else if (last2Bytes == 0xEE)
-        std::cout << "0x" << std::uppercase << std::hex << opcode << "\t | "
-                  << "RET"
-                  << "\t\t\t "
-                  << "#Return from a subroutine\n";
+        case 0x0:
+            if (last2Bytes == 0xE0)
+                std::cout << "0x" << std::uppercase << std::hex << opcode
+                          << "\t | "
+                          << "CLS"
+                          << "\t\t\t "
+                          << "#Clear the display\n";
+            else if (last2Bytes == 0xEE)
+                std::cout << "0x" << std::uppercase << std::hex << opcode
+                          << "\t | "
+                          << "RET"
+                          << "\t\t\t "
+                          << "#Return from a subroutine\n";
 
-			break;
-    case 0x1:
-        std::cout << "0x" << std::uppercase << std::hex << opcode << "\t | "
-                  << "JP " << std::hex << last3Bytes << "\t\t "
-                  << "#Jump to location 0x" << std::hex << last3Bytes << "\n";
-        break;
-    case 0x2:
-        std::cout << "0x" << std::uppercase << std::hex << opcode << "\t | "
-                  << "CALL " << std::hex << last3Bytes << "\t\t "
-                  << "#Call subroutine at 0x" << std::hex << last3Bytes << "\n";
-        break;
-    case 0x3:
-        std::cout << "0x" << std::uppercase << std::hex << opcode << "\t | "
-                  << "SE V" << std::dec << Vx << ", " << std::dec << last2Bytes
-                  << "\t\t "
-                  << "#Skip next instruction if V" << Vx << std::dec
-                  << " == " << std::dec << last2Bytes << "\n";
-        break;
-    case 0x4:
-        std::cout << "0x" << std::uppercase << std::hex << opcode << "\t | "
-                  << "SNE V" << std::dec << Vx << ", " << std::dec << last2Bytes
-                  << "\t\t "
-                  << "#Skip next instruction if V" << Vx << std::dec
-                  << " != " << std::dec << last2Bytes << "\n";
-        break;
-    case 0x5:
-        std::cout << "0x" << std::uppercase << std::hex << opcode << "\t | "
-                  << "SE V" << std::dec << Vx << ", V" << std::dec << Vy
-                  << "\t\t "
-                  << "#Skip next instruction if V" << Vx << std::dec << " == V"
-                  << std::dec << Vy << "\n";
-        break;
-    case 0x6:
-        std::cout << "0x" << std::uppercase << std::hex << opcode << "\t | "
-                  << "LD V" << std::dec << Vx << ", " << std::dec << last2Bytes
-                  << "\t\t "
-                  << "#Set V" << Vx << std::dec << " = " << std::dec
-                  << last2Bytes << "\n";
-        break;
-    case 0x7:
-        std::cout << "0x" << std::uppercase << std::hex << opcode << "\t | "
-                  << "ADD V" << std::dec << Vx << ", " << std::dec << last2Bytes
-                  << "\t\t "
-                  << "#Set V" << Vx << std::dec << " += " << std::dec
-                  << last2Bytes << "\n";
-        break;
-    case 0x8:
-        switch (lastByte) {
-        case 0:
+            break;
+        case 0x1:
             std::cout << "0x" << std::uppercase << std::hex << opcode << "\t | "
-                      << "LD V" << std::dec << Vx << ", V" << std::dec << Vy
-                      << "\t\t "
-                      << "#Set V" << Vx << std::dec << " = V" << std::dec << Vy
+                      << "JP " << std::hex << last3Bytes << "\t\t "
+                      << "#Jump to location 0x" << std::hex << last3Bytes
                       << "\n";
             break;
-        case 1:
+        case 0x2:
             std::cout << "0x" << std::uppercase << std::hex << opcode << "\t | "
-                      << "OR V" << std::dec << Vx << ", V" << std::dec << Vy
-                      << "\t\t "
-                      << "#Set V" << Vx << std::dec << " |= V" << std::dec << Vy
+                      << "CALL " << std::hex << last3Bytes << "\t\t "
+                      << "#Call subroutine at 0x" << std::hex << last3Bytes
                       << "\n";
             break;
-        case 2:
+        case 0x3:
             std::cout << "0x" << std::uppercase << std::hex << opcode << "\t | "
-                      << "AND V" << std::dec << Vx << ", V" << std::dec << Vy
-                      << "\t\t "
-                      << "#Set V" << Vx << std::dec << " &= V" << std::dec << Vy
-                      << "\n";
+                      << "SE V" << std::dec << Vx << ", " << std::dec
+                      << last2Bytes << "\t\t "
+                      << "#Skip next instruction if V" << Vx << std::dec
+                      << " == " << std::dec << last2Bytes << "\n";
             break;
-        case 3:
+        case 0x4:
             std::cout << "0x" << std::uppercase << std::hex << opcode << "\t | "
-                      << "XOR V" << std::dec << Vx << ", V" << std::dec << Vy
-                      << "\t\t "
-                      << "#Set V" << Vx << std::dec << " ^= V" << std::dec << Vy
-                      << "\n";
+                      << "SNE V" << std::dec << Vx << ", " << std::dec
+                      << last2Bytes << "\t\t "
+                      << "#Skip next instruction if V" << Vx << std::dec
+                      << " != " << std::dec << last2Bytes << "\n";
             break;
-        case 4:
+        case 0x5:
             std::cout << "0x" << std::uppercase << std::hex << opcode << "\t | "
-                      << "ADD V" << std::dec << Vx << ", V" << std::dec << Vy
+                      << "SE V" << std::dec << Vx << ", V" << std::dec << Vy
                       << "\t\t "
-                      << "#Set V" << Vx << std::dec << " += V" << std::dec << Vy
-                      << ", set V15 = carry\n";
+                      << "#Skip next instruction if V" << Vx << std::dec
+                      << " == V" << std::dec << Vy << "\n";
             break;
-        case 5:
+        case 0x6:
             std::cout << "0x" << std::uppercase << std::hex << opcode << "\t | "
-                      << "SUB V" << std::dec << Vx << ", V" << std::dec << Vy
+                      << "LD V" << std::dec << Vx << ", " << std::dec
+                      << last2Bytes << "\t\t "
+                      << "#Set V" << Vx << std::dec << " = " << std::dec
+                      << last2Bytes << "\n";
+            break;
+        case 0x7:
+            std::cout << "0x" << std::uppercase << std::hex << opcode << "\t | "
+                      << "ADD V" << std::dec << Vx << ", " << std::dec
+                      << last2Bytes << "\t\t "
+                      << "#Set V" << Vx << std::dec << " += " << std::dec
+                      << last2Bytes << "\n";
+            break;
+        case 0x8:
+            switch (lastByte) {
+                case 0:
+                    std::cout << "0x" << std::uppercase << std::hex << opcode
+                              << "\t | "
+                              << "LD V" << std::dec << Vx << ", V" << std::dec
+                              << Vy << "\t\t "
+                              << "#Set V" << Vx << std::dec << " = V"
+                              << std::dec << Vy << "\n";
+                    break;
+                case 1:
+                    std::cout << "0x" << std::uppercase << std::hex << opcode
+                              << "\t | "
+                              << "OR V" << std::dec << Vx << ", V" << std::dec
+                              << Vy << "\t\t "
+                              << "#Set V" << Vx << std::dec << " |= V"
+                              << std::dec << Vy << "\n";
+                    break;
+                case 2:
+                    std::cout << "0x" << std::uppercase << std::hex << opcode
+                              << "\t | "
+                              << "AND V" << std::dec << Vx << ", V" << std::dec
+                              << Vy << "\t\t "
+                              << "#Set V" << Vx << std::dec << " &= V"
+                              << std::dec << Vy << "\n";
+                    break;
+                case 3:
+                    std::cout << "0x" << std::uppercase << std::hex << opcode
+                              << "\t | "
+                              << "XOR V" << std::dec << Vx << ", V" << std::dec
+                              << Vy << "\t\t "
+                              << "#Set V" << Vx << std::dec << " ^= V"
+                              << std::dec << Vy << "\n";
+                    break;
+                case 4:
+                    std::cout << "0x" << std::uppercase << std::hex << opcode
+                              << "\t | "
+                              << "ADD V" << std::dec << Vx << ", V" << std::dec
+                              << Vy << "\t\t "
+                              << "#Set V" << Vx << std::dec << " += V"
+                              << std::dec << Vy << ", set V15 = carry\n";
+                    break;
+                case 5:
+                    std::cout << "0x" << std::uppercase << std::hex << opcode
+                              << "\t | "
+                              << "SUB V" << std::dec << Vx << ", V" << std::dec
+                              << Vy << "\t\t "
+                              << "#Set V" << Vx << std::dec << " -= V"
+                              << std::dec << Vy << ", set V15 = NOT borrow\n";
+                    break;
+                case 6:
+                    std::cout << "0x" << std::uppercase << std::hex << opcode
+                              << "\t | "
+                              << "SHR V" << std::dec << Vx << " {, V"
+                              << std::dec << Vy << "}\t\t "
+                              << "#Set V" << Vx << std::dec << " = V"
+                              << std::dec << Vx << " SHR 1\n";
+                    break;
+                case 7:
+                    std::cout << "0x" << std::uppercase << std::hex << opcode
+                              << "\t | "
+                              << "SUBN V" << std::dec << Vx << ", V" << std::dec
+                              << Vy << "\t\t "
+                              << "#Set V" << Vx << std::dec << " = V"
+                              << std::dec << Vy << " - V" << std::dec << Vx
+                              << ", set V15 = NOT borrow\n";
+                    break;
+                case 0xE:
+                    std::cout << "0x" << std::uppercase << std::hex << opcode
+                              << "\t | "
+                              << "SHL V" << std::dec << Vx << " {, V"
+                              << std::dec << Vy << "}\t\t "
+                              << "#Set V" << Vx << std::dec << " = V"
+                              << std::dec << Vx << " SHL 1\n";
+                    break;
+                default:
+                    std::cout << "0x" << std::uppercase << std::hex << opcode
+                              << "\t | "
+                              << "UNKNOWN OPCODE\n";
+                    break;
+            }
+            break;
+        case 0x9:
+            std::cout << "0x" << std::uppercase << std::hex << opcode << "\t | "
+                      << "SNE V" << std::dec << Vx << ", V" << std::dec << Vy
                       << "\t\t "
-                      << "#Set V" << Vx << std::dec << " -= V" << std::dec << Vy
-                      << ", set V15 = NOT borrow\n";
+                      << "#Skip next instruction if V" << Vx << std::dec
+                      << " != V" << std::dec << Vy << "\n";
             break;
-        case 6:
+        case 0xA:
             std::cout << "0x" << std::uppercase << std::hex << opcode << "\t | "
-                      << "SHR V" << std::dec << Vx << " {, V" << std::dec << Vy
-                      << "}\t\t "
-                      << "#Set V" << Vx << std::dec << " = V" << std::dec << Vx
-                      << " SHR 1\n";
+                      << "LD I, " << std::hex << last3Bytes << "\t\t "
+                      << "#Set I = " << std::dec << last3Bytes << "\n";
             break;
-        case 7:
+        case 0xB:
             std::cout << "0x" << std::uppercase << std::hex << opcode << "\t | "
-                      << "SUBN V" << std::dec << Vx << ", V" << std::dec << Vy
-                      << "\t\t "
-                      << "#Set V" << Vx << std::dec << " = V" << std::dec << Vy
-                      << " - V" << std::dec << Vx << ", set V15 = NOT borrow\n";
+                      << "JP V0, " << std::hex << last3Bytes << "\t\t "
+                      << "#Jump to location 0x" << std::hex << last3Bytes
+                      << " + V0\n";
+            break;
+        case 0xC:
+            std::cout << "0x" << std::uppercase << std::hex << opcode << "\t | "
+                      << "RND V" << std::dec << Vx << ", " << std::dec
+                      << last2Bytes << "\t\t "
+                      << "#Set V" << Vx << std::dec << " = (Random byte & "
+                      << std::hex << last2Bytes << ")\n";
+            break;
+        case 0xD:
+            std::cout << "0x" << std::uppercase << std::hex << opcode << "\t | "
+                      << "DRW V" << std::dec << Vx << ", V" << std::dec << Vy
+                      << ", " << std::dec << lastByte << "\t "
+                      << "#Display " << std::dec << lastByte
+                      << "-byte sprite starting at memory location I at (V"
+                      << std::dec << Vx << ", V" << std::dec << Vy
+                      << "), set V15 = collision \n";
             break;
         case 0xE:
-            std::cout << "0x" << std::uppercase << std::hex << opcode << "\t | "
-                      << "SHL V" << std::dec << Vx << " {, V" << std::dec << Vy
-                      << "}\t\t "
-                      << "#Set V" << Vx << std::dec << " = V" << std::dec << Vx
-                      << " SHL 1\n";
+            if (last2Bytes == 0x9E)
+                std::cout << "0x" << std::uppercase << std::hex << opcode
+                          << "\t | "
+                          << "SKP V" << std::dec << Vx << "\t\t "
+                          << "#Skip next instruction if key with the value of V"
+                          << std::dec << Vx << " is pressed\n";
+            else if (last2Bytes == 0xA1)
+                std::cout << "0x" << std::uppercase << std::hex << opcode
+                          << "\t | "
+                          << "SKNP V" << std::dec << Vx << "\t\t "
+                          << "#Skip next instruction if key with the value of V"
+                          << std::dec << Vx << " is not pressed\n";
+            break;
+        case 0xF:
+            switch (last2Bytes) {
+                case 0x07:
+                    std::cout << "0x" << std::uppercase << std::hex << opcode
+                              << "\t | "
+                              << "LD V, " << std::dec << Vx << ", DT\t\t "
+                              << "#Set V" << std::dec << Vx
+                              << " = delay timer value"
+                              << "\n";
+                    break;
+                case 0x0A:
+                    std::cout << "0x" << std::uppercase << std::hex << opcode
+                              << "\t | "
+                              << "LD V, " << std::dec << Vx << ", K\t\t "
+                              << "#Wait for a key press, store the value of "
+                                 "the key in V"
+                              << std::dec << Vx << "\n";
+                    break;
+                case 0x15:
+                    std::cout << "0x" << std::uppercase << std::hex << opcode
+                              << "\t | "
+                              << "LD DT, V" << std::dec << Vx << "\t\t "
+                              << "#Set delay timer =  V" << std::dec << Vx
+                              << "\n";
+                    break;
+                case 0x18:
+                    std::cout << "0x" << std::uppercase << std::hex << opcode
+                              << "\t | "
+                              << "LD ST, V" << std::dec << Vx << "\t\t "
+                              << "#Set sound timer =  V" << std::dec << Vx
+                              << "\n";
+                    break;
+                case 0x1E:
+                    std::cout << "0x" << std::uppercase << std::hex << opcode
+                              << "\t | "
+                              << "ADD I, V" << std::dec << Vx << "\t\t "
+                              << "#Set I += V" << std::dec << Vx << "\n";
+                    break;
+                case 0x29:
+                    std::cout << "0x" << std::uppercase << std::hex << opcode
+                              << "\t | "
+                              << "LD F, V" << std::dec << Vx << "\t\t "
+                              << "#Set I = location of sprite for digit V"
+                              << std::dec << Vx << "\n";
+                    break;
+                case 0x33:
+                    std::cout << "0x" << std::uppercase << std::hex << opcode
+                              << "\t | "
+                              << "LD B, V" << std::dec << Vx << "\t\t "
+                              << "#Store BCD representation of V" << std::dec
+                              << Vx << " in memory locations I, I+1 and I+2\n";
+                    break;
+                case 0x55:
+                    std::cout << "0x" << std::uppercase << std::hex << opcode
+                              << "\t | "
+                              << "LD [I], V" << std::dec << Vx << "\t\t "
+                              << "#Store registers V0 through V" << std::dec
+                              << Vx << " in memory starting at location I\n";
+                    break;
+                case 0x65:
+                    std::cout << "0x" << std::uppercase << std::hex << opcode
+                              << "\t | "
+                              << "LD V" << std::dec << Vx << ", [I]\t\t "
+                              << "#Read registers V0 through V" << std::dec
+                              << Vx << " from memory starting at location I\n";
+                    break;
+                default:
+                    std::cout << "0x" << std::uppercase << std::hex << opcode
+                              << "\t | "
+                              << "UNKNOWN OPCODE\n";
+                    break;
+            }
             break;
         default:
             std::cout << "0x" << std::uppercase << std::hex << opcode << "\t | "
                       << "UNKNOWN OPCODE\n";
             break;
-        }
-        break;
-    case 0x9:
-        std::cout << "0x" << std::uppercase << std::hex << opcode << "\t | "
-                  << "SNE V" << std::dec << Vx << ", V" << std::dec << Vy
-                  << "\t\t "
-                  << "#Skip next instruction if V" << Vx << std::dec << " != V"
-                  << std::dec << Vy << "\n";
-        break;
-    case 0xA:
-        std::cout << "0x" << std::uppercase << std::hex << opcode << "\t | "
-                  << "LD I, " << std::hex << last3Bytes << "\t\t "
-                  << "#Set I = " << std::dec << last3Bytes << "\n";
-        break;
-    case 0xB:
-        std::cout << "0x" << std::uppercase << std::hex << opcode << "\t | "
-                  << "JP V0, " << std::hex << last3Bytes << "\t\t "
-                  << "#Jump to location 0x" << std::hex << last3Bytes
-                  << " + V0\n";
-        break;
-    case 0xC:
-        std::cout << "0x" << std::uppercase << std::hex << opcode << "\t | "
-                  << "RND V" << std::dec << Vx << ", " << std::dec << last2Bytes
-                  << "\t\t "
-                  << "#Set V" << Vx << std::dec << " = (Random byte & "
-                  << std::hex << last2Bytes << ")\n";
-        break;
-    case 0xD:
-        std::cout << "0x" << std::uppercase << std::hex << opcode << "\t | "
-                  << "DRW V" << std::dec << Vx << ", V" << std::dec << Vy
-                  << ", " << std::dec << lastByte << "\t "
-                  << "#Display " << std::dec << lastByte
-                  << "-byte sprite starting at memory location I at (V"
-                  << std::dec << Vx << ", V" << std::dec << Vy
-                  << "), set V15 = collision \n";
-        break;
-    case 0xE:
-        if (last2Bytes == 0x9E)
-            std::cout << "0x" << std::uppercase << std::hex << opcode << "\t | "
-                      << "SKP V" << std::dec << Vx << "\t\t "
-                      << "#Skip next instruction if key with the value of V"
-                      << std::dec << Vx << " is pressed\n";
-        else if (last2Bytes == 0xA1)
-            std::cout << "0x" << std::uppercase << std::hex << opcode << "\t | "
-                      << "SKNP V" << std::dec << Vx << "\t\t "
-                      << "#Skip next instruction if key with the value of V"
-                      << std::dec << Vx << " is not pressed\n";
-        break;
-    case 0xF:
-        switch (last2Bytes) {
-        case 0x07:
-            std::cout << "0x" << std::uppercase << std::hex << opcode << "\t | "
-                      << "LD V, " << std::dec << Vx << ", DT\t\t "
-                      << "#Set V" << std::dec << Vx << " = delay timer value"
-                      << "\n";
-            break;
-        case 0x0A:
-            std::cout
-                << "0x" << std::uppercase << std::hex << opcode << "\t | "
-                << "LD V, " << std::dec << Vx << ", K\t\t "
-                << "#Wait for a key press, store the value of the key in V"
-                << std::dec << Vx << "\n";
-            break;
-        case 0x15:
-            std::cout << "0x" << std::uppercase << std::hex << opcode << "\t | "
-                      << "LD DT, V" << std::dec << Vx << "\t\t "
-                      << "#Set delay timer =  V" << std::dec << Vx << "\n";
-            break;
-        case 0x18:
-            std::cout << "0x" << std::uppercase << std::hex << opcode << "\t | "
-                      << "LD ST, V" << std::dec << Vx << "\t\t "
-                      << "#Set sound timer =  V" << std::dec << Vx << "\n";
-            break;
-        case 0x1E:
-            std::cout << "0x" << std::uppercase << std::hex << opcode << "\t | "
-                      << "ADD I, V" << std::dec << Vx << "\t\t "
-                      << "#Set I += V" << std::dec << Vx << "\n";
-            break;
-        case 0x29:
-            std::cout << "0x" << std::uppercase << std::hex << opcode << "\t | "
-                      << "LD F, V" << std::dec << Vx << "\t\t "
-                      << "#Set I = location of sprite for digit V" << std::dec
-                      << Vx << "\n";
-            break;
-        case 0x33:
-            std::cout << "0x" << std::uppercase << std::hex << opcode << "\t | "
-                      << "LD B, V" << std::dec << Vx << "\t\t "
-                      << "#Store BCD representation of V" << std::dec << Vx
-                      << " in memory locations I, I+1 and I+2\n";
-            break;
-        case 0x55:
-            std::cout << "0x" << std::uppercase << std::hex << opcode << "\t | "
-                      << "LD [I], V" << std::dec << Vx << "\t\t "
-                      << "#Store registers V0 through V" << std::dec << Vx
-                      << " in memory starting at location I\n";
-            break;
-        case 0x65:
-            std::cout << "0x" << std::uppercase << std::hex << opcode << "\t | "
-                      << "LD V" << std::dec << Vx << ", [I]\t\t "
-                      << "#Read registers V0 through V" << std::dec << Vx
-                      << " from memory starting at location I\n";
-            break;
-        default:
-            std::cout << "0x" << std::uppercase << std::hex << opcode << "\t | "
-                      << "UNKNOWN OPCODE\n";
-            break;
-        }
-        break;
-    default:
-        std::cout << "0x" << std::uppercase << std::hex << opcode << "\t | "
-                  << "UNKNOWN OPCODE\n";
-        break;
     }
 }
 
